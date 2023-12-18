@@ -1,18 +1,21 @@
-import './App.scss';
-import Header from './components/Header';
-import TableUsers from './components/TableUsers';
+import { Container } from "react-bootstrap";
+import "./App.scss";
+import Header from "./components/Header";
+import TableUsers from "./components/TableUsers";
 
 function App() {
-  return(
+  return (
     <>
-      <div className='app-container'>
+      <div className="app-container">
         {/* <Container> */}
-          <Header/>
-          <TableUsers/>
+        <Header />
+        <Container>
+          <TableUsers />
+        </Container>
         {/* </Container> */}
       </div>
     </>
-  )
+  );
 }
 
 export default App;
