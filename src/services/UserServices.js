@@ -4,4 +4,7 @@ const fetchAllUser = (page) => {
     return axios.get(`/api/users?page=${page}`)
 
 }
-export {fetchAllUser};
+const postCreateUser = (name, job) =>{
+    return axios.post("/api/users", {name, job})    //viết tắt cho name:name, job:job
+}
+export {fetchAllUser ,postCreateUser};
