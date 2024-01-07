@@ -1,39 +1,29 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Modal, Button } from "react-bootstrap";
 import { postCreateUser } from "../services/UserServices";
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-const ModalAddNew = (props) => {
-  const { show, handleClose, handleUpdateTables } = props;
+const ModalEditUser = (props) => {
+  const { show, handleClose, dataUserEdit } = props;
   const [name, setName] = useState("");
   const [job, setJob] = useState("");
 
-  
+  const handleEditUser = () => {
+  }
 
-  const handleSaveUser = async () => {
-    let res = await postCreateUser(name, job); // truyền thg name với job vào
-    console.log(">>>> check state: ",res);
-    if(res && res.id){
-        //success
-
-        handleClose();
-        setName("");
-        setJob("");
-        toast.success("A User is create succeed!");
-        handleUpdateTables({first_name: name, id: res.id})
-    }else{
-        //error
-
-        toast.error("An error...");
-
+  useEffect(() => {
+    if(show) {
+      setName(dataUserEdit.first_name)
     }
-  };
+  }, [dataUserEdit])
+
+  console.log(">>> check props: ", dataUserEdit)
   return (
     <>
       <Modal show={show} onHide={handleClose}>
         <Modal.Header closeButton>
-          <Modal.Title>Add user</Modal.Title>
+          <Modal.Title>Edit a user</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <div className="body-add-new">
@@ -61,12 +51,12 @@ const ModalAddNew = (props) => {
           <Button variant="secondary" onClick={handleClose}>
             Close
           </Button>
-          <Button variant="primary" onClick={() => handleSaveUser()}>
-            Save Changes
+          <Button variant="primary" onClick={() => handleEditUser()}>
+            Confirm
           </Button>
         </Modal.Footer>
       </Modal>
     </>
   );
 };
-export default ModalAddNew;
+export default ModalEditUser;

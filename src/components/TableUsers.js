@@ -3,6 +3,7 @@ import Table from "react-bootstrap/Table";
 import { fetchAllUser } from "../services/UserServices";
 import ReactPaginate from "react-paginate";
 import ModalAddNew from "./ModalAddNew";
+import ModalEditUser from "./ModalEditUser";
 
 const TableUsers = (props) => {
   const [listUsers, setListUsers] = useState([]);
@@ -10,14 +11,17 @@ const TableUsers = (props) => {
   const [totalPages, setTotalPages] = useState(0);
 
   const [isShowModalAddNew, setIsShowModalAddNew] = useState(false);
+  const [isShowModalEdit, setIsShowModalEdit] = useState(false);
+  const [dataUserEdit, setDataUserEdit] = useState({});
 
   const handleClose = () => {
     setIsShowModalAddNew(false);
+    setIsShowModalEdit(false);
   };
 
   const handleUpdateTable = (user) => {
-    setListUsers([user, ...listUsers])
-  }
+    setListUsers([user, ...listUsers]);
+  };
 
   useEffect(() => {
     //call apis
@@ -37,10 +41,15 @@ const TableUsers = (props) => {
   };
 
   const handlePageClick = (event) => {
-    console.log("event lib: ", event)
-    getUsers(+event.selected +1);  // thêm dấu cộng trước event để convert kiểu string sang num nếu selected đang kiểu string
-  }
+    console.log("event lib: ", event);
+    getUsers(+event.selected + 1); // thêm dấu cộng trước event để convert kiểu string sang num nếu selected đang kiểu string
+  };
   console.log(listUsers);
+
+  const handleEditUsers = (user) => {
+    setDataUserEdit(user);
+    setIsShowModalEdit(true);
+  };
   return (
     <>
       <div className="my-3 add-new">
@@ -73,6 +82,15 @@ const TableUsers = (props) => {
                   <td>{item.email}</td>
                   <td>{item.first_name}</td>
                   <td>{item.last_name}</td>
+                  <td>
+                    <button
+                      className="btn btn-warning mx-3 "
+                      onClick={() => handleEditUsers(item)}
+                    >
+                      Edit
+                    </button>
+                    <button className="btn btn-danger">Delete</button>
+                  </td>
                 </tr>
               );
             })}
@@ -108,10 +126,15 @@ const TableUsers = (props) => {
         containerClassName="pagination"
         activeClassName="active"
       />
-      <ModalAddNew 
-          show={isShowModalAddNew} 
-          handleClose={handleClose}
-          handleUpdateTables = {handleUpdateTable}
+      <ModalAddNew
+        show={isShowModalAddNew}
+        handleClose={handleClose}
+        handleUpdateTables={handleUpdateTable}
+      />
+      <ModalEditUser
+        show={isShowModalEdit}
+        dataUserEdit={dataUserEdit}
+        handleClose={handleClose}
       />
     </>
   );
