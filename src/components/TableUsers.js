@@ -4,6 +4,7 @@ import { fetchAllUser } from "../services/UserServices";
 import ReactPaginate from "react-paginate";
 import ModalAddNew from "./ModalAddNew";
 import ModalEditUser from "./ModalEditUser";
+import { cloneDeep } from "lodash";
 
 const TableUsers = (props) => {
   const [listUsers, setListUsers] = useState([]);
@@ -21,6 +22,16 @@ const TableUsers = (props) => {
 
   const handleUpdateTable = (user) => {
     setListUsers([user, ...listUsers]);
+  };
+
+  const handleEditUserFromModal = (user) => {
+    let cloneListUsers = cloneDeep(listUsers);
+    let index = listUsers.findIndex((item) => item.id === user.id);
+    cloneListUsers[index].first_name = user.first_name;
+    setListUsers(cloneListUsers);
+    console.log(">>> index = ", index);
+    console.log(listUsers, cloneListUsers);
+
   };
 
   useEffect(() => {
@@ -44,7 +55,6 @@ const TableUsers = (props) => {
     console.log("event lib: ", event);
     getUsers(+event.selected + 1); // thêm dấu cộng trước event để convert kiểu string sang num nếu selected đang kiểu string
   };
-  console.log(listUsers);
 
   const handleEditUsers = (user) => {
     setDataUserEdit(user);
@@ -135,6 +145,7 @@ const TableUsers = (props) => {
         show={isShowModalEdit}
         dataUserEdit={dataUserEdit}
         handleClose={handleClose}
+        handleEditUserFromModal={handleEditUserFromModal}
       />
     </>
   );
