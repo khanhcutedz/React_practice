@@ -27,6 +27,7 @@ const TableUsers = (props) => {
   const [sortField, setSortField] = useState("id");
 
   const [keyword, setKeyword] = useState("");
+  const [dataExport, setDataExport] = useState([]);
 
   const handleClose = () => {
     setIsShowModalAddNew(false);
@@ -115,6 +116,22 @@ const TableUsers = (props) => {
     ["Yezzi", "Min l3b", "ymin@cocococo.com"],
   ];
 
+  const getUsersExport = (event, done) => { // dung thu vien
+    let result = [];
+    if(listUsers && listUsers.length > 0 ){
+      result.push(["Id", "Email", "First name", "Last name"])
+      listUsers.map((item, index ) => {
+        let arr = [];
+        arr[0] = item.id;
+        arr[1] = item.email;
+        arr[2] = item.first_name;
+        arr[3] = item.last_name;
+        result.push(arr);
+      })
+      setDataExport(result); // thg nay duoc cap nhat xong data={dataExport} duoc cap nhat lai luon
+      done(); // goi thg done de thu vien biet da xu ly xong asyncOnClick={true} onClick={getUsersExport}
+    }
+  }
   return (
     <>
       <div className="my-3 add-new">
@@ -128,9 +145,11 @@ const TableUsers = (props) => {
           <input id="test" type="file" hidden />
 
           <CSVLink
-            data={csvData}
             filename={"my-file.csv"}
             className="btn btn-primary"
+            data={dataExport}
+            asyncOnClick={true} // goi ham onClick truoc xong moi get dataExport 
+            onClick={getUsersExport} //
           >
             <i className="fa-solid fa-file-arrow-down"></i> Export Excel
           </CSVLink>
