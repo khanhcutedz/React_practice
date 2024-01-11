@@ -9,7 +9,8 @@ import { cloneDeep, debounce, filter } from "lodash";
 import _ from "lodash";
 import "./TableUsers.scss";
 import { CSVLink, CSVDownload } from "react-csv";
-import { ButtonToolbar } from "react-bootstrap";
+import Papa from "papaparse";
+import { toast } from "react-toastify";
 
 const TableUsers = (props) => {
   const [listUsers, setListUsers] = useState([]);
@@ -116,22 +117,75 @@ const TableUsers = (props) => {
     ["Yezzi", "Min l3b", "ymin@cocococo.com"],
   ];
 
-  const getUsersExport = (event, done) => { // dung thu vien
+  // Export
+  const getUsersExport = (event, done) => {
+    // dung thu vien
     let result = [];
-    if(listUsers && listUsers.length > 0 ){
-      result.push(["Id", "Email", "First name", "Last name"])
-      listUsers.map((item, index ) => {
+    if (listUsers && listUsers.length > 0) {
+      result.push(["Id", "Email", "First name", "Last name"]);
+      listUsers.map((item, index) => {
         let arr = [];
         arr[0] = item.id;
         arr[1] = item.email;
         arr[2] = item.first_name;
         arr[3] = item.last_name;
         result.push(arr);
-      })
+      });
       setDataExport(result); // thg nay duoc cap nhat xong data={dataExport} duoc cap nhat lai luon
       done(); // goi thg done de thu vien biet da xu ly xong asyncOnClick={true} onClick={getUsersExport}
     }
-  }
+  };
+
+  //Import
+  const handleImportCSV = (event) => {
+    if (event.target && event.target.value && event.target.value[0]) {
+      let file = event.target.files[0]; // upload co 1 file nen lay file[0] la thg dau tien minh chon -- quy dinh cua Html
+      if (file.type !== "text/csv") {
+        toast.error("Only accept csv files...");
+        return;
+      }
+      // Parse local CSV file
+
+      Papa.parse(file, {
+        // header: true,
+        complete: function (results) {
+          let rawCSV = results.data;
+          if (rawCSV.length > 0) {
+            if (rawCSV[0] && rawCSV[0].length === 3) { // check cai tieu de hop le ko
+              if (
+                rawCSV[0][0] !== "Email" ||
+                rawCSV[0][1] !== "First name" ||
+                rawCSV[0][2] !== "Last name"
+              ) {
+                toast.error("Wrong format Header CSV file!");
+              }else{
+                // console.log(">>raw: ",rawCSV);
+
+                let result = [];
+                rawCSV.map((item,index) => {
+                  if(index > 0 && item.length === 3){ // check xem co thg nao trong list rawCSV ko du 3 cot ko << tru thg tieu de
+                    let obj = {};
+                    obj.email = item[0]
+                    obj.first_name = item[1];
+                    obj.last_name = item[2];
+                    result.push(obj);
+                  }
+                })
+                setListUsers(result);
+                console.log(">>>check result: ", result);
+              }
+            } else {
+              toast.error("Wrong format CSV file!");
+            }
+          } else {
+            toast.error("Not found data on CSV file!");
+          }
+          // console.log(results);
+          // console.log("Finished:", results.data);
+        },
+      });
+    }
+  };
   return (
     <>
       <div className="my-3 add-new">
@@ -142,13 +196,18 @@ const TableUsers = (props) => {
           <label htmlFor="test" className="btn btn-warning">
             <i className="fa-solid fa-file-import"></i> Import
           </label>
-          <input id="test" type="file" hidden />
+          <input
+            id="test"
+            type="file"
+            hidden
+            onChange={(event) => handleImportCSV(event)} // thu vien
+          />
 
           <CSVLink
             filename={"my-file.csv"}
             className="btn btn-primary"
             data={dataExport}
-            asyncOnClick={true} // goi ham onClick truoc xong moi get dataExport 
+            asyncOnClick={true} // goi ham onClick truoc xong moi get dataExport
             onClick={getUsersExport} //
           >
             <i className="fa-solid fa-file-arrow-down"></i> Export Excel
