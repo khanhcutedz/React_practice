@@ -8,6 +8,8 @@ import ModalConfirm from "./ModalConfirm";
 import { cloneDeep, debounce, filter } from "lodash";
 import _ from "lodash";
 import "./TableUsers.scss";
+import { CSVLink, CSVDownload } from "react-csv";
+import { ButtonToolbar } from "react-bootstrap";
 
 const TableUsers = (props) => {
   const [listUsers, setListUsers] = useState([]);
@@ -94,16 +96,24 @@ const TableUsers = (props) => {
   };
   const handleSearch = debounce((event) => {
     let term = event.target.value;
-    console.log(">>> run search term... ", term);  
-    if(term){
+    console.log(">>> run search term... ", term);
+    if (term) {
       let cloneListUsers = _.cloneDeep(listUsers);
-      cloneListUsers = cloneListUsers.filter(item => item.email.includes(term));
-      setListUsers(cloneListUsers); 
-    }
-    else{
+      cloneListUsers = cloneListUsers.filter((item) =>
+        item.email.includes(term)
+      );
+      setListUsers(cloneListUsers);
+    } else {
       getUsers(2);
     }
-  }, 500)
+  }, 500);
+
+  const csvData = [
+    ["firstname", "lastname", "email"],
+    ["Ahmed", "Tomi", "ah@smthing.co.com"],
+    ["Raed", "Labes", "rl@smthing.co.com"],
+    ["Yezzi", "Min l3b", "ymin@cocococo.com"],
+  ];
 
   return (
     <>
@@ -111,12 +121,26 @@ const TableUsers = (props) => {
         <span>
           <b>List Users:</b>
         </span>
-        <button
-          className="btn btn-success"
-          onClick={() => setIsShowModalAddNew(true)}
-        >
-          Add new user
-        </button>
+        <div className="group-btns">
+          <label htmlFor="test" className="btn btn-warning">
+            <i className="fa-solid fa-file-import"></i> Import
+          </label>
+          <input id="test" type="file" hidden />
+
+          <CSVLink
+            data={csvData}
+            filename={"my-file.csv"}
+            className="btn btn-primary"
+          >
+            <i className="fa-solid fa-file-arrow-down"></i> Export Excel
+          </CSVLink>
+          <button
+            className="btn btn-success"
+            onClick={() => setIsShowModalAddNew(true)}
+          >
+            <i className="fa-solid fa-circle-plus "></i> Add new user
+          </button>
+        </div>
       </div>
       <div className="col-4 my-3 ">
         <input
